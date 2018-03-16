@@ -1,7 +1,7 @@
 import unittest
 import io
 
-from parseEDL import _EdlLine, parseStream
+from ..parseEDL import _EdlLine, parseStream
 
 class TestExpMatch(unittest.TestCase):
 
