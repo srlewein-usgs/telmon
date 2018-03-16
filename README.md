@@ -26,3 +26,5 @@ Create an API to access the information. Samples might include:
 	 - Returne time entries for an array of stations.
 	 
 Integrate with location services to display a map where telemetry information may be viewed.
+
+Tests can be run by `python -m unittest` from the project directory.
