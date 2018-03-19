@@ -1,5 +1,6 @@
-import re
-import io
+from re import search
+from os.path import getmtime, basename 
+from json import dumps
 from time import gmtime, strftime, time
 
 def parseFile(filepath):
@@ -16,16 +17,17 @@ def parseFile(filepath):
 	data : EDL file serialized as JSON objects
 	
 	"""
-	#edlData = EDLData()
-	
-    with open(filepath, 'r') as file:
-        line = next(file)
-        while line:
-            parsedLine = _EdlLine(line)
-            #edlData.append(parsedLine)
+
+    file = open(filepath, 'r')
+    fname = basename(filepath)
+    dtg = strftime("%Y-%m-%d %H:%M:%S",gmtime(getmtime(filepath)))  
+    edlFile = EdlFile(fname, dtg)    
+    line = next(file)
+    while line:
+        edlFile.parseline(line.rstrip())
         line = next(file,None)
-	
-    return edlData
+    file.close()
+    return edlFile.serialize()
     
 def parseStream(input):
 #     """
@@ -95,39 +97,45 @@ class EdlFile:
              suffix = str(int(round(time())))
              self.filename = 'assigned' + suffix
         if filedate:
-            if re.search('\d{4}\-\d{1,2}\-\d{1,2}\s\d{2}\:\d{2}\:\d{2}',filedate):
+            if search('\d{4}\-\d{1,2}\-\d{1,2}\s\d{2}\:\d{2}\:\d{2}',filedate):
                 self.filedtg = filedate
             else:
                 err = 'Date format should be 2017-3-2017 19:00:00 NOT: ' + filedate
                 raise ValueError(err) 
         else:
-            self.filedtg = strftime("%Y-%m-%d %H:%M:%S", gmtime())     
+            self.filedtg = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+        #initialize rest of the class variables
+        self.SOURCE = None
+        self.STATION = None
+        self.DEVICE = None
+        self.OVERWRITE = None
+        self.timeanddatum = []
             
     def parseline(self, line):
 	# check on what kind of a line has been received, then parse it
         if(line == None):
             raise RuntimeError('Null Value') 
-        if re.search('SOURCE*',line):
+        if search('SOURCE*',line):
             a = line.split(' ');
             source = a[1]
             self.SOURCE = source
             return 
-        if re.search('STATION*',line):
+        if search('STATION*',line):
             a = line.split(' ');
             station = a[1]
             self.STATION = station
             return 
-        if re.search('DEVICE*',line):
+        if search('DEVICE*',line):
             a = line.split(' ');
             device = a[1]
             self.DEVICE = device
             return 
-        if re.search('OVERWRITE*',line):
+        if search('OVERWRITE*',line):
             a = line.split(' ');
             overwrite = a[1]
             self.OVERWRITE = overwrite
             return 
-        if re.search('\d{4}\/\d{1,2}\/\d{1,2}',line):
+        if search('\d{4}\/\d{1,2}\/\d{1,2}',line):
             #Taking advantage of standard format, not very spart parsing.
             tempdate = line[1:17]
             monitordate = tempdate.replace('/','-')
@@ -138,5 +146,40 @@ class EdlFile:
         err = 'Do not recognize: ' + line
         raise ValueError(err)           
 
- 
+    def serialize(self):
+     
+        #if there are not values for every output, throw a RuntimeError
+        self.isincomplete()
+        serializedJson = dumps({'filename':self.filename, 'filedtg':self.filedtg,'SOURCE':self.SOURCE,
+        'STATION':self.STATION,'DEVICE':self.DEVICE,'OVERWRITE':self.OVERWRITE,'timeanddatum':self.timeanddatum})
+        return serializedJson
+     
+     
+    def isincomplete(self):
+     
+        error = []
+        
+        if self.filename == None:
+            error.append('filename')
+        elif self.filedtg == None:
+            error.append('filedtg')
+        elif self.SOURCE == None:
+            error.append('SOURCE')
+        elif self.STATION == None:
+            error.append('STATION')
+        elif self.DEVICE == None:
+            error.append('DEVICE')
+        elif self.OVERWRITE == None:
+            error.append('OVERWRITE')
+        elif self.timeanddatum == []:
+            error.append('timeanddatum')
+        
+        if error == []:
+            return False
+        
+        errmsg = 'Missing data for: ' + str(error)
+        raise RuntimeError(errmsg)    
+            
+         
+         
  

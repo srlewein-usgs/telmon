@@ -1,7 +1,9 @@
 import unittest
 import io
+import os
+import json
 
-from ..parseEDL import EdlFile, parseStream
+from ..parseEDL import EdlFile, parseStream, parseFile
 
 class TestExpMatch(unittest.TestCase):
 
@@ -49,9 +51,9 @@ class TestExpMatch(unittest.TestCase):
     def test_dataline(self):
 
         edlFile = EdlFile('Afile', '2017-12-12 10:00:00')
-        edlFile.parseline('"2018/02/19 02:00", 3188.3097222222264')
+        edlFile.parseline('"2018/02/19 02:00", 3188.3097222222265')
         self.assertEqual(edlFile.timeanddatum[0][0],'2018-02-19 02:00')
-        self.assertEqual(edlFile.timeanddatum[0][1], '3188.3097222222264') 
+        self.assertEqual(edlFile.timeanddatum[0][1], '3188.3097222222265') 
 
     def test_bogusline(self):
  
@@ -69,8 +71,48 @@ class TestExpMatch(unittest.TestCase):
     
          with self.assertRaises(RuntimeError): 
             edlFile = EdlFile('Afile', '2017-12-12 10:00:00')         
-            edlFile.parseline(None)              
+            edlFile.parseline(None)   
+            
+class TestSerialization(unittest.TestCase):
+   
+    def test_jsonoutput(self):
+        
+        edlFile = EdlFile('Afile', '2017-12-12 10:00:00')
+        edlFile.parseline('//SOURCE nwiswa EDL')
+        edlFile.parseline('//STATION 12113390')
+        edlFile.parseline('//DEVICE GRFILTF-1')
+        edlFile.parseline('//OVERWRITE true')
+        edlFile.parseline('"2018/02/19 02:00", 3188.3097222222264')
+        ret_json = edlFile.serialize()
+        parsed_json = json.loads(ret_json)
+        self.assertEqual('Afile', parsed_json['filename'])
+        self.assertEqual('2017-12-12 10:00:00', parsed_json['filedtg'])
+        self.assertEqual('nwiswa', parsed_json['SOURCE'])
+        self.assertEqual('12113390', parsed_json['STATION'])
+        self.assertEqual('GRFILTF-1', parsed_json['DEVICE'])
+        self.assertEqual('true', parsed_json['OVERWRITE'])
+        self.assertEqual('2018-02-19 02:00', parsed_json['timeanddatum'][0][0])
+        self.assertEqual('3188.3097222222264', parsed_json['timeanddatum'][0][1])
+       
+    def test_incomplete(self):
+    
+        with self.assertRaises(RuntimeError): 
+            edlFile = EdlFile('Afile', '2017-12-12 10:00:00') 
+            ret_json = edlFile.serialize()
+        
+class TestFileInput(unittest.TestCase):
 
+    def test_loadfile(self):
+    
+        fileandpath = os.path.abspath('telmon/test/testedl.txt')
+        ret_json = parseFile(fileandpath)
+        parsed_json = json.loads(ret_json)
+        self.assertIsNotNone(ret_json)
+        # just spot check
+        self.assertEqual('12113390', parsed_json['STATION'])
+        
+        
+        
 """
 class TestStreamInput(unittest.TestCase):  
 
