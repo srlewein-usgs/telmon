@@ -7,6 +7,7 @@ class TestUpload(unittest.TestCase):
     
     conn = None
     smalljson = None
+    jsonthree = None
     
     def setUp(self):
         
@@ -18,6 +19,11 @@ class TestUpload(unittest.TestCase):
         file = open('telmon/test/small.json', 'r')
         self.smalljson = file.read()
         file.close()
+        
+        #load larger json object
+        file = open('telmon/test/three.json', 'r')
+        self.jsonthree = file.read()
+        file.close()
  
     def test_loaddb(self):
         
@@ -26,11 +32,23 @@ class TestUpload(unittest.TestCase):
         c = self.conn.cursor()
         c.execute('SELECT COUNT(*) FROM telemetry_files')
         retval = c.fetchall()
-        print(retval)
         val1 = retval[0][0]
         self.assertEqual(1, val1)
+        c.execute('SELECT COUNT(*) FROM telemetry_measures')
+        retval = c.fetchall()
+        val1 = retval[0][0]
+        self.assertEqual(1, val1)
+ 
+    def test_loadthree(self):
 
-       
+        uploader = UploadEdl(self.conn, self.jsonthree)
+        self.conn.commit()
+        c = self.conn.cursor()
+        c.execute('SELECT COUNT(*) FROM telemetry_measures')
+        retval = c.fetchall()
+        val1 = retval[0][0]
+        self.assertEqual(3, val1)      
+ 
     def tearDown(self):
 
         c = self.conn.cursor()

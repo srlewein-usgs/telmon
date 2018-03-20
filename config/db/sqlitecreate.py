@@ -9,7 +9,7 @@ c = conn.cursor()
 # Create File table
 c.execute('CREATE TABLE telemetry_files(source text, station text, file_name text, file_dtg text)')
 
-c.execute('CREATE TABLE telemetry_measures(source text, device text,\
+c.execute('CREATE TABLE telemetry_measures(source text, station text, device text,\
             overwrite text, measurement_time text, measurement_data text)')
 
 conn.commit()

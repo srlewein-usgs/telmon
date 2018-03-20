@@ -31,6 +31,22 @@ class UploadEdl:
                "', '" + j['filename'] +"', '"+ j['filedtg'] +"')"
         cursor.execute(qstr)
         
+        vqstr = ''
+        print(j['timeanddatum'])
+        for values in j['timeanddatum']:
+            qstr = "('"  + j['SOURCE'] +"', '"+ j['STATION'] +\
+               "', '" + j['DEVICE']  +"', '"+ j['OVERWRITE'] +\
+               "', '" + values[0] +"', '"+ values[1] + "'),"
+            vqstr = vqstr + qstr
+        
+        # remove the trailing comma        
+        vqstr = vqstr[:-1]
+        qstr = 'INSERT INTO telemetry_measures VALUES ' + vqstr
+        print(qstr)
+        
+        cursor.execute(qstr)
+              
+        
     
         
     
