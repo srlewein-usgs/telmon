@@ -3,7 +3,7 @@ import io
 import os
 import json
 
-from ..parseEDL import EdlFile, parseStream, parseFile
+from ..parseEDL import EdlFile, parseStream, parseFile,
 
 class TestExpMatch(unittest.TestCase):
 
@@ -111,7 +111,12 @@ class TestFileInput(unittest.TestCase):
         # just spot check
         self.assertEqual('12113390', parsed_json['STATION'])
         
-        
+class TestUploadEDLPackage(unittest.TestCase):
+
+    def test_loadfile(self)
+
+        fileandpath = os.path.abspath('telmon/test/testedl.txt')
+        uploadEDL         
         
 """
 class TestStreamInput(unittest.TestCase):  

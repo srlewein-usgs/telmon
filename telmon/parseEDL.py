@@ -2,6 +2,7 @@ from re import search
 from os.path import getmtime, basename 
 from json import dumps
 from time import gmtime, strftime, time
+import sys, getopt
 
 def parseFile(filepath):
     """
@@ -179,7 +180,38 @@ class EdlFile:
         
         errmsg = 'Missing data for: ' + str(error)
         raise RuntimeError(errmsg)    
-            
+
+def main2(argv):
+    filetoparse = ''
+    databaseconnectstr = '' 
+    user = ''
+    pwd = ''
+    try:
+        opts, args = getopt.getopt(argv,'hf:c:u:p:')
+    except getopt.GetoptError:
+        print ('parseEDL.py -f <file> -c <dbconnect> -u <user> -p <password>')
+        sys.exit()
+    for opt, arg in opts:
+        if opt == '-h':
+            print ('parseEDL.py -f <file> -c <dbconnect> -u <user> -p <password>')
+            sys.exit()
+        elif opt == '-f':
+            filetoparse = arg
+        elif opt == '-c':
+            databaseconnectstr = arg
+        elif opt == '-u':
+            user = arg
+        elif opt == '-p':
+            pwd = arg
+    if filetoparse == '':
+        print('parseEDL.py -f file')
+       
+    print ('Load file ' + filetoparse + ' to ' + databaseconnectstr + ' user: ' + user + ' pwd: xxxxx')                   
+    jsonobj = parseFile(filetoparse)
+    print(jsonobj)
+    print ('Completed ' + filetoparse)
          
-         
+  
+if __name__== "__main__":
+    main2(sys.argv[1:])
  

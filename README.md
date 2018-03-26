@@ -27,4 +27,4 @@ Create an API to access the information. Samples might include:
 	 
 Integrate with location services to display a map where telemetry information may be viewed.
 
-Tests can be run by `python -m unittest` from the project directory.
+Tests can be run by `python3 -m unittest` from the project directory.
