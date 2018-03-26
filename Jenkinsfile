@@ -7,10 +7,12 @@ pipeline {
                 echo 'Building...' 
             }
         }
+    }
         
         stage('Test') {
             steps {
-                echo 'Testing...' 
+                echo 'Testing...'
+                sh 'python3 -m unittest' 
             }
         } 
         
