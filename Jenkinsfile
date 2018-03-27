@@ -12,14 +12,15 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Testing...'
-                sh "cd %WORKSPACE/telmon"
-                sh 'python -m unittest' 
+                sh "cd %WORKSPACE/telmon
+				    python3.6 -m unittest"
             }
         } 
         
         stage('Deploy') {
             steps {
                 echo 'Deploying...' 
+			    ssh $ec2-user@10.12.10.69 rm -rf /home/ec2-user/telmon
             }
         }        
     }
