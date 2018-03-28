@@ -13,7 +13,7 @@ pipeline {
             steps {
                 echo 'Testing...'
                 
-                dir('$WORKSPACE/telmon') {
+                dir('/var/lib/jenkins/jobs/telmon_deploy/workspace/telmon') {
                     sh 'python3.6 -m unittest'
                 }
             }
