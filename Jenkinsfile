@@ -12,8 +12,10 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Testing...'
-                sh "cd %WORKSPACE/telmon
-				    python3.6 -m unittest"
+                
+                dir("%WORKSPACE/telmon) {
+                    sh 'python3.6 -m unittest'
+                }
             }
         } 
         
