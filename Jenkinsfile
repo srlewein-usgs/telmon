@@ -13,7 +13,7 @@ pipeline {
             steps {
                 echo 'Testing...'
                 
-                dir('/telmon') {
+                dir('$WORKSPACE/telmon') {
                     sh 'python3.6 -m unittest'
                 }
             }
